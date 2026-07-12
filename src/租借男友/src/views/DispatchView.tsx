@@ -247,7 +247,7 @@ export function DispatchView() {
     <div className="w-full h-full bg-halftone flex flex-col">
       
       {/* Scrollable top area */}
-      <div className="flex-1 overflow-y-auto pt-24 md:pt-20 p-4 md:p-8">
+      <div className="flex-1 overflow-y-auto pt-36 md:pt-32 p-4 md:p-8">
         
         <div className="max-w-7xl mx-auto space-y-8 pb-12">
         

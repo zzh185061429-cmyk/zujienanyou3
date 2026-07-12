@@ -22,13 +22,13 @@ import { motion, AnimatePresence } from 'motion/react';
 import { cn } from './utils';
 
 // 计算等比例缩放比：手机端缩小，PC 端保持 1
-function calcZoomScale(): number {
+function calcScale(): number {
   const designW = 1280;
   const designH = 720;
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const scale = Math.min(1, vw / designW, vh / designH);
-  return Math.max(0.5, scale); // 保护最小缩放 0.5
+  return Math.max(0.5, scale);
 }
 
 type Tab = 'story' | 'dispatch' | 'archive';
@@ -43,7 +43,7 @@ function AppContent() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [zoomScale, setZoomScale] = useState(1);
+  const [scale, setScale] = useState(1);
   const { isEyeCareMode, isViewingHistory, viewingFloorId, lastAssistantFloorId, goToLatest } = useGameContext();
   const { showToast } = useToast();
 
@@ -60,7 +60,7 @@ function AppContent() {
 
   // 监听窗口大小变化，动态计算缩放比
   useEffect(() => {
-    const updateScale = () => setZoomScale(calcZoomScale());
+    const updateScale = () => setScale(calcScale());
     updateScale();
     window.addEventListener('resize', updateScale);
     return () => window.removeEventListener('resize', updateScale);
@@ -122,12 +122,13 @@ function AppContent() {
       className="w-full h-full flex items-center justify-center overflow-hidden"
       style={{ backgroundColor: '#1a1a1a' }}
     >
-      {/* 缩放容器：只改变渲染尺寸，不改变内部布局流 */}
+      {/* 缩放容器：使用 transform scale 实现真正的等比例填满 */}
       <div 
         style={{ 
-          zoom: zoomScale,
-          width: zoomScale < 1 ? '1280px' : '100%',
-          height: zoomScale < 1 ? '720px' : '100%',
+          width: scale < 1 ? '1280px' : '100%',
+          height: scale < 1 ? '720px' : '100%',
+          transform: `scale(${scale})`,
+          transformOrigin: 'top left',
           maxWidth: '100%',
           maxHeight: '100%',
         }}
@@ -137,7 +138,7 @@ function AppContent() {
             "flex flex-col bg-pop-black overflow-hidden font-sans relative transition-all duration-300",
             isScriptMode
               ? "w-full h-full"
-              : (isFullscreen ? "h-screen" : "w-full aspect-[3/4]")
+              : (isFullscreen ? "h-screen" : "w-full aspect-[16/9]")
           )}
           style={{ filter: isEyeCareMode ? 'sepia(0.2) brightness(0.9) contrast(0.95)' : 'none' }}
         >
